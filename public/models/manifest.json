@@ -1,0 +1,17 @@
+{
+  "bmw": {
+    "sourceBytes": 15329648,
+    "optimizedBytes": 7030004,
+    "triangles": 71421
+  },
+  "mrc140": {
+    "sourceBytes": 10159880,
+    "optimizedBytes": 1812884,
+    "triangles": 181582
+  },
+  "supra": {
+    "sourceBytes": 3148492,
+    "optimizedBytes": 1988768,
+    "triangles": 29980
+  }
+}

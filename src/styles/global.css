@@ -29,3 +29,12 @@
 .garage-disclaimer a{color:#a7bba9;text-underline-offset:3px}
 .paint-swatches{flex-wrap:wrap}
 @media(max-width:760px){.model-loading-panel h2{font-size:26px}.model-loading-panel p{font-size:11px}.paint-swatches{gap:12px}.paint-swatches button{width:31px;height:31px}.garage-disclaimer{line-height:1.8;max-width:88%}}
+.asset-source{display:block!important;margin-top:22px;font-size:6px!important;letter-spacing:1px!important;opacity:.75}
+.collection-loading{position:absolute;inset:auto;top:23%;left:32%;width:33%;max-width:380px;max-height:430px;padding:20px;background:#0c171bd9;border:1px solid #82b4a52e;backdrop-filter:blur(8px)}
+.collection-loading .model-loading-panel{padding:12px 0;border:0}.collection-loading h2{font-size:23px}.collection-loading p{font-size:10px}.collection-loading .button{min-width:0;width:100%}
+.original-finish-note{font-size:9px!important;letter-spacing:.8px;border-top:1px solid var(--line);padding-top:20px;margin-top:18px;line-height:1.8!important;color:#a3b4ba!important}
+.fps-indicator{position:absolute;right:0;top:48px;font-size:6px;letter-spacing:1.2px;color:#8fac9c}.hud-top-right{position:relative}
+@media(max-width:760px){.collection-loading{top:190px;left:6%;width:88%;max-width:none;max-height:205px;padding:15px;overflow:auto}.collection-loading .eyebrow,.collection-loading .asset-source{display:none!important}.collection-loading h2{font-size:19px;margin:3px 0 8px}.collection-loading p{font-size:9px}.collection-loading .model-loading-track{margin:14px 0 10px}.collection-loading .button{min-height:36px;margin-top:12px}.fps-indicator{top:36px;font-size:5px;letter-spacing:.5px}.original-finish-note{font-size:10px!important}.garage-disclaimer{top:1190px}}
+.asset-credit-link{display:block;font-size:9px;color:#9bb8ac;margin:0 0 22px;text-underline-offset:4px}
+@media(min-width:761px) and (max-height:760px){.garage-screen{overflow-y:auto;scrollbar-width:thin;scrollbar-color:#426754 #101a1b}.garage-spec{padding-bottom:60px}}
+@media(min-width:761px) and (max-height:700px){.hero .controls-link{display:none}}
