@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { World } from './World';
 import { Car } from './Car';
+import { BMWLoadingOverlay, useBMWAsset } from './BMWCar';
 import { vehicles } from '../data/vehicles';
 import { useGame } from '../store/gameStore';
 import { Engine, input, clearInput, presentation } from './engine';
@@ -19,10 +20,11 @@ function Scene(){
  const vehicle=vehicles.find(v=>v.id===selected)||vehicles[0];
  const engine=useMemo(()=>new Engine(vehicle),[session,vehicle]);
  const player=useRef<THREE.Group>(null),traffic=useRef<(THREE.Group|null)[]>([]),tokens=useRef<(THREE.Group|null)[]>([]),particles=useRef<THREE.InstancedMesh>(null);
- const distance=useRef(0),elapsed=useRef(0),hudTimer=useRef(0),eventId=useRef(0),crashTime=useRef(0),motion=useRef({speed:0,steer:0,sliding:false});
+ const distance=useRef(0),elapsed=useRef(0),hudTimer=useRef(0),eventId=useRef(0),crashTime=useRef(0),motion=useRef({speed:0,steer:0,sliding:false,boosting:false});
  useEffect(()=>{elapsed.current=0;crashTime.current=0;eventId.current=0;clearInput();},[session]);
  useFrame(({camera,clock,size},rawDt)=>{
   const dt=Math.min(rawDt,.05),state=useGame.getState(),phase=state.phase;audio.enabled=state.save.sound;
+  if(vehicle.model==='bmw'&&useBMWAsset.getState().status!=='ready'){audio.update(0,false,false,false);return;}
   if(phase==='COUNTDOWN'){elapsed.current+=dt;engine.notice=String(Math.max(1,3-Math.floor(elapsed.current*1.4)));engine.noticeTime=1;engine.speed=65;if(elapsed.current>2.1){engine.notify('GO · OWN THE ROAD','go');state.setPhase('PLAYING');}}
   if(phase==='PLAYING'){
    engine.autoDrive=state.save.autoDrive;
@@ -35,8 +37,8 @@ function Scene(){
   if(phase==='MENU'||phase==='GARAGE'){distance.current+=dt*1.7;}
   if(phase==='PLAYING'||phase==='CRASHING'||phase==='COUNTDOWN'){hudTimer.current+=dt;if(hudTimer.current>.09){state.updateHUD(engine.hud());hudTimer.current=0;}}
   const driving=!['MENU','GARAGE'].includes(phase);
-  if(player.current){player.current.position.set(driving?engine.x:1.75,.025+(phase==='PLAYING'?Math.sin(engine.time*18)*Math.min(.018,engine.speed*.0001):0),0);player.current.rotation.set(0,driving?engine.yaw+(engine.dead?Math.min(crashTime.current*.8,.7):0):phase==='GARAGE'?presentation.rotation:Math.PI+.25+Math.sin(clock.elapsedTime*.23)*.025,driving?-engine.lateral*.008:0);player.current.visible=!(phase==='PLAYING'&&engine.invincible>0&&Math.floor(engine.invincible*12)%2===0);}
-  motion.current.speed=driving?engine.speed:0;motion.current.steer=engine.lateral;motion.current.sliding=engine.sliding;
+  if(player.current){player.current.position.set(driving?engine.x:1.75,.025+(phase==='PLAYING'?Math.sin(engine.time*18)*Math.min(.018,engine.speed*.0001):0),0);player.current.rotation.set(0,driving?engine.yaw+(engine.dead?Math.min(crashTime.current*.8,.7):0):phase==='GARAGE'?presentation.rotation+(vehicle.model==='bmw'?Math.PI+.25:0):Math.PI+.25+Math.sin(clock.elapsedTime*.23)*.025,driving?-engine.lateral*.008:0);player.current.visible=!(phase==='PLAYING'&&engine.invincible>0&&Math.floor(engine.invincible*12)%2===0);}
+  motion.current.speed=phase==='PLAYING'?engine.speed:0;motion.current.boosting=phase==='PLAYING'&&engine.boost;motion.current.steer=engine.lateral;motion.current.sliding=engine.sliding;
   for(let i=0;i<traffic.current.length;i++){const obj=traffic.current[i],t=engine.traffic[i];if(obj){obj.visible=driving;obj.position.set(t.x,0,t.z);obj.rotation.y=t.hit?.15:0;}}
   tokens.current.forEach((obj,i)=>{if(!obj)return;const t=engine.tokens[i];obj.visible=driving&&t.active;obj.position.set(t.x,1.15+Math.sin(engine.time*3+i)*.12,t.z);obj.rotation.set(0,engine.time*2+i,Math.PI/2);});
   if(particles.current){engine.particles.forEach((p,i)=>{dummy.position.set(p.x,p.y,p.z);const size=p.life>0?Math.max(0,p.life/p.max)*(p.kind===0?.38:.1):0;dummy.scale.setScalar(size);dummy.updateMatrix();particles.current!.setMatrixAt(i,dummy.matrix);particles.current!.setColorAt(i,particleColors[p.kind]);});particles.current.instanceMatrix.needsUpdate=true;if(particles.current.instanceColor)particles.current.instanceColor.needsUpdate=true;}
@@ -52,4 +54,4 @@ function Scene(){
   <instancedMesh ref={particles} args={[undefined,undefined,96]} frustumCulled={false}><icosahedronGeometry args={[1,0]}/><meshBasicMaterial transparent opacity={.65}/></instancedMesh>
  </>;
 }
-export function GameScene(){const quality=useGame(s=>s.save.quality);return <div className="scene"><Canvas shadows dpr={quality==='high'?[1,1.4]:[1,1]} gl={{antialias:quality==='high',powerPreference:'high-performance'}} camera={{position:[10,4.1,11],fov:45,near:.1,far:1300}}><Suspense fallback={null}><Scene/></Suspense></Canvas></div>;}
+export function GameScene(){const quality=useGame(s=>s.save.quality);return <div className="scene"><Canvas shadows dpr={quality==='high'?[1,1.4]:[1,1]} gl={{antialias:quality==='high',powerPreference:'high-performance'}} camera={{position:[10,4.1,11],fov:45,near:.1,far:1300}}><Suspense fallback={null}><Scene/></Suspense></Canvas><BMWLoadingOverlay/></div>;}

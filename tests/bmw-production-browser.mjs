@@ -1,0 +1,47 @@
+import { chromium } from 'playwright';
+import bundled from '@sparticuz/chromium';
+import { strict as assert } from 'node:assert';
+import { mkdir,writeFile,mkdtemp } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
+import { brotliDecompressSync } from 'node:zlib';
+import { execFileSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+// The npm-distributed browser allows testing in restricted-network environments.
+const dir=await mkdtemp(join(tmpdir(),'luxury-browser-'));
+await writeFile(join(dir,'libs.tar'),brotliDecompressSync(readFileSync('node_modules/@sparticuz/chromium/bin/al2023.tar.br')));
+execFileSync('tar',['xf',join(dir,'libs.tar'),'-C',dir]);
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH||await bundled.executablePath(),args:[...bundled.args.filter(a=>!['--single-process','--in-process-gpu'].includes(a)),'--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'],headless:true,env:{...process.env,LD_LIBRARY_PATH:join(dir,'lib')+':'+(process.env.LD_LIBRARY_PATH||'')}});
+const errors=[];
+const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
+page.on('pageerror',error=>errors.push(error.message));
+page.on('console',message=>{if(message.type()==='error')errors.push(message.text());});
+try {
+  await page.addInitScript(()=>localStorage.setItem('luxury-drive-v1',JSON.stringify({quality:'low',sound:false})));
+  const cdp=await page.context().newCDPSession(page);
+  const assetResponse=page.waitForResponse(response=>/\/assets\/bmw-[^/]+\.glb$/.test(new URL(response.url()).pathname)&&response.status()===200,{timeout:120000});
+  await page.goto(process.env.PRODUCTION_URL||'http://localhost:5174');
+  const response=await assetResponse;const bytes=Buffer.from(await (await fetch(response.url())).arrayBuffer());
+  assert.equal(bytes.length,15329648);assert.equal(bytes.toString('ascii',0,4),'glTF');assert.equal(bytes.readUInt32LE(4),2);
+  const {createHash}=await import('node:crypto');assert.equal(createHash('sha256').update(bytes).digest('hex'),createHash('sha256').update(readFileSync('3d/bmw.glb')).digest('hex'));
+  await page.locator('.model-loading-overlay').waitFor({state:'hidden',timeout:120000});
+  assert.ok(await page.getByRole('heading',{name:'BMW M3 E30'}).isVisible());console.log('PASS production build serves the byte-identical BMW GLB at its hashed deployment URL');
+  await page.getByRole('button',{name:'Start driving',exact:true}).click();
+  await page.locator('.phase-playing').waitFor({timeout:180000});
+  const gas=await page.getByRole('button',{name:'Gas',exact:true}).boundingBox(),left=await page.getByRole('button',{name:'Left',exact:true}).boundingBox(),nitro=await page.getByRole('button',{name:'Nitro',exact:true}).boundingBox();
+  const g={x:gas.x+gas.width/2,y:gas.y+gas.height/2,id:1},l={x:left.x+left.width/2,y:left.y+left.height/2,id:2},n={x:nitro.x+nitro.width/2,y:nitro.y+nitro.height/2,id:3};
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[g]});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[g,l]});
+  await page.waitForFunction(()=>Number(document.querySelector('.speedometer strong')?.textContent)>90,null,{timeout:120000});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[g]});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[g,n]});
+  await page.waitForFunction(()=>Number(document.querySelector('.nitro-panel strong')?.textContent.replace('%',''))<94,null,{timeout:120000});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  await page.getByRole('button',{name:'Pause game'}).click();await page.getByRole('button',{name:'Resume drive'}).waitFor();
+  console.log('PASS BMW mobile production gameplay, simultaneous steering/gas, nitro, cancelled touches and pause');
+  await page.addStyleTag({content:'.overlay{display:none!important}'});
+  await page.evaluate(()=>{window.requestAnimationFrame=()=>0;});await page.waitForTimeout(500);
+  await mkdir('.playwright',{recursive:true});await page.screenshot({path:'.playwright/bmw-mobile-production.png',timeout:120000});
+  assert.deepEqual(errors,[]);console.log('PASS production rendering has no browser or WebGL errors');
+} finally {await browser.close();}

@@ -7,7 +7,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "test": "vitest run",
-    "test:browser": "node tests/browser.mjs"
+    "test:browser": "node tests/browser.mjs",
+    "test:bmw": "node tests/bmw-browser.mjs",
+    "test:bmw:production": "node tests/bmw-production-browser.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.0",
