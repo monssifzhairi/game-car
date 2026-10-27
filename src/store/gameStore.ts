@@ -1,0 +1,8 @@
+import { create } from 'zustand';
+import { readSave,writeSave } from '../utils/storage';
+import type { Save } from '../utils/storage';
+export type Phase='MENU'|'GARAGE'|'COUNTDOWN'|'PLAYING'|'PAUSED'|'CRASHING'|'GAME_OVER';
+export interface HUD {speed:number;score:number;distance:number;cash:number;nitro:number;health:number;near:number;drift:number;maxSpeed:number;notice:string;combo:number}
+export const emptyHUD:HUD={speed:0,score:0,distance:0,cash:0,nitro:100,health:100,near:0,drift:0,maxSpeed:0,notice:'',combo:0};
+type Store={phase:Phase;save:Save;hud:HUD;session:number;setPhase:(p:Phase)=>void;start:()=>void;updateHUD:(h:HUD)=>void;finish:(h:HUD)=>void;updateSave:(v:Partial<Save>)=>void;purchase:(id:string,price:number)=>boolean};
+export const useGame=create<Store>((set,get)=>({phase:'MENU',save:readSave(),hud:{...emptyHUD},session:0,setPhase:phase=>set({phase}),start:()=>set(s=>({phase:'COUNTDOWN',session:s.session+1,hud:{...emptyHUD}})),updateHUD:hud=>set({hud}),updateSave:v=>{const save={...get().save,...v};writeSave(save);set({save});},purchase:(id,price)=>{const {save,updateSave}=get();if(save.unlocked.includes(id))return true;if(save.cash<price)return false;updateSave({cash:save.cash-price,unlocked:[...save.unlocked,id]});return true;},finish:hud=>{const {save}=get();const run={score:Math.floor(hud.score),distance:Math.floor(hud.distance),vehicle:save.selected,date:new Date().toISOString()};const next={...save,cash:save.cash+Math.floor(hud.cash),best:Math.max(save.best,run.score),bestDistance:Math.max(save.bestDistance,run.distance),runs:[...save.runs,run].sort((a,b)=>b.score-a.score).slice(0,5)};writeSave(next);set({phase:'GAME_OVER',save:next,hud:{...hud}});}}));
