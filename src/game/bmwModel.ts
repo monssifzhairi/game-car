@@ -28,7 +28,7 @@ function materialName(mesh: THREE.Mesh): string {
 
 /** Expand quantized attributes before applying transforms: writing world coordinates
  * back into normalized int16 attributes would clamp/wrap and corrupt the wheels. */
-function floatGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
+export function floatGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
   const geometry = new THREE.BufferGeometry();
   for (const [name, attribute] of Object.entries(source.attributes)) {
     const values = new Float32Array(attribute.count * attribute.itemSize);
@@ -42,7 +42,7 @@ function floatGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
 }
 
 /** Keep vertices/UVs/normals intact and remap only the indices of each wheel. */
-function extractPart(source: THREE.BufferGeometry, indices: number[]): THREE.BufferGeometry {
+export function extractPart(source: THREE.BufferGeometry, indices: number[]): THREE.BufferGeometry {
   const geometry = new THREE.BufferGeometry();
   const remap = new Map<number, number>();
   for (const index of indices) if (!remap.has(index)) remap.set(index, remap.size);

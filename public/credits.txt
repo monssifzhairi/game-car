@@ -1,0 +1,45 @@
+LUXURY DRIVE 3D — ASSET CREDITS
+
+BMW M3 E30
+Author: Martin Trafas / Bexxie
+https://sketchfab.com/Bexxie
+Source: https://sketchfab.com/3d-models/free-bmw-m3-e30-ac3c7013434e403e8faff87948caf422
+License declared in original GLB: CC BY 4.0
+https://creativecommons.org/licenses/by/4.0/
+Changes: WebP texture encoding, Meshopt compression, runtime scale/orientation,
+original wheel triangles reparented under steering/spinning pivots, optional paint.
+Original user-supplied file is retained unchanged in 3d/bmw.glb.
+
+MERCEDES-BENZ S-CLASS W140
+Author: Black Snow
+https://sketchfab.com/BlackSnow02
+Source: https://sketchfab.com/3d-models/mersedes-benz-s-class-w140-ad9650076f4c491eb90d65ccb1378b9a
+License declared in original GLB: CC BY 4.0
+https://creativecommons.org/licenses/by/4.0/
+Changes: Conservative border-locked simplification (0.03% error limit), texture
+and Meshopt compression, runtime scale and orientation. Palette materials retained.
+Original user-supplied file is retained unchanged in 3d/mrc140.glb.
+
+TOYOTA SUPRA
+Supplied by the repository owner in 3d/supra.glb.
+The file has no embedded creator or license metadata. This project does not add
+a license to it. Confirm creator permission/licensing before public redistribution
+if that permission is not already held.
+Changes: WebP textures, Meshopt compression, unused transform animations omitted
+from runtime copy, original wheel geometry rigged for driving, scale/orientation.
+Original file is retained unchanged.
+
+PHOTOGRAPHIC PBR SURFACES AND SKY
+Provider: ambientCG (CC0 1.0)
+https://ambientcg.com/
+https://creativecommons.org/publicdomain/zero/1.0/
+Asphalt019: https://ambientcg.com/view?id=Asphalt019
+Concrete031: https://ambientcg.com/view?id=Concrete031
+Facade014: https://ambientcg.com/view?id=Facade014
+SkyOnlyHDRI017: https://ambientcg.com/view?id=SkyOnlyHDRI017
+Source mirror: https://github.com/Malcolmnixon/DarkCity/tree/main/assets/ambientcg.com
+Changes: resized for browser use, converted to WebP, sky color-graded.
+
+BMW, Mercedes-Benz and Toyota names/logos belong to their respective owners.
+This game is not an official product or endorsement of those manufacturers.
+Other three garage cars, traffic and scene architecture are original procedural work.

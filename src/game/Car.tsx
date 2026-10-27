@@ -2,11 +2,11 @@ import { useMemo, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { Vehicle } from '../data/vehicles';
-import { BMWCar } from './BMWCar';
-import type { VehicleMotion } from './BMWCar';
+import { ImportedCar } from './ImportedCar';
+import type { VehicleMotion } from './ImportedCar';
 export type CarProps = {vehicle:Vehicle;color:string;traffic?:boolean;motion?:VehicleMotion;boost?:boolean};
 export function Car(props: CarProps) {
- if (props.vehicle.model === 'bmw') return <BMWCar color={props.color} motion={props.motion} />;
+ if (props.vehicle.model) return <ImportedCar key={props.vehicle.model} id={props.vehicle.model} color={props.color} motion={props.motion} />;
  return <ProceduralCar {...props} />;
 }
 export function shell(rings:number[][]){const verts:number[]=[],indices:number[]=[];for(const [z,w,b,t] of rings){const bevel=.10;verts.push(-w+bevel,b,z,w-bevel,b,z,w,b+bevel,z,w,t-bevel,z,w-bevel,t,z,-w+bevel,t,z,-w,t-bevel,z,-w,b+bevel,z);}for(let r=0;r<rings.length-1;r++)for(let j=0;j<8;j++){const a=r*8+j,b=r*8+(j+1)%8,c=(r+1)*8+j,d=(r+1)*8+(j+1)%8;indices.push(a,b,c,b,d,c);}for(let j=1;j<7;j++){indices.push(0,j+1,j);const a=(rings.length-1)*8;indices.push(a,a+j,a+j+1);}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));g.setIndex(indices);g.computeVertexNormals();return g;}
