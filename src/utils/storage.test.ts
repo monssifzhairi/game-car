@@ -1,0 +1,8 @@
+import {it,expect,beforeEach} from 'vitest';
+import {readSave,writeSave,defaults} from './storage';
+const store:Record<string,string>={};
+beforeEach(()=>{Object.keys(store).forEach(k=>delete store[k]);Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:(k:string)=>store[k]??null,setItem:(k:string,v:string)=>{store[k]=v;}}});});
+it('safely handles missing and malformed data',()=>{expect(readSave()).toEqual(defaults);store['luxury-drive-v1']='{broken';expect(readSave()).toEqual(defaults);});
+it('validates numeric fields and vehicle selection',()=>{store['luxury-drive-v1']=JSON.stringify({cash:-100,best:'9999',selected:'spectre',unlocked:['apex','not-a-car'],runs:[{score:-1}]});const save=readSave();expect(save.cash).toBe(0);expect(save.best).toBe(0);expect(save.selected).toBe('apex');expect(save.unlocked).toEqual(['apex']);expect(save.runs).toHaveLength(0);});
+it('persists progression and keeps only the top five runs',()=>{writeSave({...defaults,cash:1500,unlocked:['apex','crest'],selected:'crest',cosmetics:['#155b48'],runs:Array.from({length:8},(_,i)=>({score:i*100,distance:100,vehicle:'apex',date:new Date().toISOString()}))});const loaded=readSave();expect(loaded.cash).toBe(1500);expect(loaded.selected).toBe('crest');expect(loaded.cosmetics).toContain('#155b48');expect(loaded.runs).toHaveLength(5);expect(loaded.runs[0].score).toBe(700);});
+it('continues when browser storage is disabled',()=>{Object.defineProperty(globalThis,'localStorage',{value:{getItem:()=>{throw new Error('blocked');},setItem:()=>{throw new Error('blocked');}},configurable:true});expect(readSave()).toEqual(defaults);expect(()=>writeSave(defaults)).not.toThrow();});
