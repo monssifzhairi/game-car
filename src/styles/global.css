@@ -16,3 +16,16 @@
 @media(prefers-reduced-motion:reduce){.screen-enter,.game-notice,.crash-flash{animation:none}button,.nitro-track>i{transition:none}}
 
 .hero h1{width:max-content}.hero sup{left:100%}
+/* Actual uploaded BMW asset: no substitute vehicle while loading or on failure. */
+.model-loading-overlay{position:fixed;inset:0;z-index:45;display:flex;align-items:center;justify-content:center;padding:26px;background:rgba(8,19,20,.96);backdrop-filter:blur(10px)}
+.model-loading-panel{width:460px;max-width:100%;border-top:1px solid #62d7ac55;padding:28px 0;color:var(--ivory)}
+.model-loading-panel h2{font-size:31px;font-weight:400;letter-spacing:-.7px;margin:21px 0 14px}
+.model-loading-panel p{font-size:12px;color:#a7b9ab;line-height:1.9}
+.model-loading-track{height:3px;background:#bccdb629;margin:28px 0 14px;overflow:hidden}
+.model-loading-track i{display:block;height:100%;background:var(--green);transition:width .25s}
+.model-loading-panel>small{font-size:7px;letter-spacing:1.3px;color:#87a38e;line-height:1.8}
+.model-loading-panel code{display:block;max-height:95px;overflow:auto;margin:20px 0;font-size:10px;line-height:1.7;color:#d4b28f;overflow-wrap:anywhere}
+.model-loading-panel .button{margin-top:24px;min-width:220px;justify-content:space-between}
+.garage-disclaimer a{color:#a7bba9;text-underline-offset:3px}
+.paint-swatches{flex-wrap:wrap}
+@media(max-width:760px){.model-loading-panel h2{font-size:26px}.model-loading-panel p{font-size:11px}.paint-swatches{gap:12px}.paint-swatches button{width:31px;height:31px}.garage-disclaimer{line-height:1.8;max-width:88%}}
